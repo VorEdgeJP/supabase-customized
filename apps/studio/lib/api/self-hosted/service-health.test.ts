@@ -142,7 +142,7 @@ describe('api/self-hosted/service-health', () => {
       expect(result.info).toEqual({ version: 'PostgreSQL 15.8 on x86_64-pc-linux-gnu' })
       expect(vi.mocked(executeQuery)).toHaveBeenCalledWith({
         query: 'select version()',
-        readOnly: true,
+        readOnly: false,
       })
     })
 

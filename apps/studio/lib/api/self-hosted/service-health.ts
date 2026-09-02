@@ -160,10 +160,12 @@ export async function checkDatabase(): Promise<SelfHostedServiceHealth> {
     })
 
     // Hardcoded query with no user input; the database is reached through pg-meta.
+    // Connects as the read-write user, which is what the rest of Studio uses. The
+    // read-only user is optional in self-hosted stacks and often does not exist.
     const result = await Promise.race([
       executeQuery<{ version?: unknown }>({
         query: DATABASE_VERSION_QUERY,
-        readOnly: true,
+        readOnly: false,
       }),
       timedOut,
     ])

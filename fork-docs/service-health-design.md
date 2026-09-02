@@ -208,5 +208,5 @@ Kong 構成 (`docker-compose.kong.yml`) でも `api-gw` のサービス名は同
 
 - Edge Runtime v1.74 の `/_internal/health` が `docker/volumes/functions/main/index.ts` 経由で 200 を返すかは未検証です。そのため `functions` はまず「HTTP 応答があれば OK」とし、実機で `/_internal/health` が使えると分かれば URL を差し替えます。
 - Realtime のテナント ID `realtime-dev` はコンテナ名から導出される固定値です。デフォルト URL にハードコードし、変更が必要な場合は環境変数で上書きします。
-- `db` のチェックは pg-meta を経由するため、`meta` が落ちていると `db` も `UNHEALTHY` になります。`error` にその旨を含めて区別できるようにします。将来的に `pg` 直結に変える余地があります。
+- `db` のチェックは読み書きユーザー (`POSTGRES_USER_READ_WRITE`) で接続します。読み取り専用ユーザーは任意構成のため使いません。pg-meta を経由するため、`meta` が落ちていると `db` も `UNHEALTHY` になります。`error` にその旨を含めて区別できるようにします。将来的に `pg` 直結に変える余地があります。
 - 機能自体のオン・オフは `useDeploymentMode().isSelfHosted` のみで判定します。利用者が無効化したい要望が出た場合は `packages/common/enabled-features/enabled-features.json` に `self_hosted:service_health` キーを追加し、`ENABLED_FEATURES_SELF_HOSTED_SERVICE_HEALTH=false` で切れるようにします。
