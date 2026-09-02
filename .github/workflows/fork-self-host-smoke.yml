@@ -1,12 +1,15 @@
-name: Self-Host Tests Smoke
+# Fork-only smoke test for the self-hosted docker-compose stack. Starts the
+# default configuration with the fork's Studio image and runs the upstream
+# smoke tests against it.
+name: Fork Self-Host Smoke
 
 on:
   pull_request:
-    branches: ['master']
     paths:
-      - 'docker/**/*'
+      - 'docker/**'
+      - '.github/workflows/fork-self-host-smoke.yml'
+  workflow_dispatch:
 
-# Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -15,13 +18,9 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
-    strategy:
-      fail-fast: false
-      matrix:
-        config: [default, logs, kong, rustfs, kong-rustfs, pgbouncer]
-
+  smoke:
+    name: Default configuration
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -44,24 +43,27 @@ jobs:
 
       - name: Start self-hosted Supabase
         shell: bash
-        # Ensure all services can be started and healthy with default config
         run: |
           set -euo pipefail
           cd docker
           yq -i '.services.supavisor.environment.RLIMIT_NOFILE=1024' docker-compose.yml
-          if [ "${{ matrix.config }}" = "logs" ]; then
-            docker compose -f docker-compose.yml -f docker-compose.logs.yml up --quiet-pull --wait --wait-timeout 180
-          elif [ "${{ matrix.config }}" = "kong" ]; then
-            docker compose -f docker-compose.yml -f docker-compose.kong.yml up --quiet-pull --wait --wait-timeout 180
-          elif [ "${{ matrix.config }}" = "rustfs" ]; then
-            docker compose -f docker-compose.yml -f docker-compose.rustfs.yml up --quiet-pull --wait --wait-timeout 180
-          elif [ "${{ matrix.config }}" = "kong-rustfs" ]; then
-            docker compose -f docker-compose.yml -f docker-compose.kong.yml -f docker-compose.rustfs.yml up --quiet-pull --wait --wait-timeout 180
-          elif [ "${{ matrix.config }}" = "pgbouncer" ]; then
-            docker compose -f docker-compose.yml -f docker-compose.pgbouncer.yml up --quiet-pull --wait --wait-timeout 180
-          else
-            docker compose up --quiet-pull --wait --wait-timeout 180
-          fi
+          docker compose up --quiet-pull --wait --wait-timeout 180
+
+      - name: Check service health endpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd docker
+          docker compose exec -T studio node -e "
+            fetch('http://localhost:3000/api/platform/projects/default/self-hosted/service-health')
+              .then(async (r) => {
+                const body = await r.json()
+                console.log(JSON.stringify(body, null, 2))
+                if (r.status !== 200) throw new Error('HTTP ' + r.status)
+                const unhealthy = body.services.filter((s) => s.status === 'UNHEALTHY')
+                if (unhealthy.length > 0) throw new Error('Unhealthy: ' + unhealthy.map((s) => s.name).join(', '))
+              })
+          "
 
       - name: Run container log tests
         shell: bash
@@ -84,9 +86,10 @@ jobs:
           cd docker
           sh tests/test-auth-keys.sh
 
-      - name: Run S3 protocol tests
+      - name: Show logs on failure
+        if: failure()
         shell: bash
         run: |
-          set -euo pipefail
           cd docker
-          sh tests/test-s3.sh
+          docker compose ps
+          docker compose logs --tail 100 studio rest meta

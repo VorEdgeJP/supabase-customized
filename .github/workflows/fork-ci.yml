@@ -1,0 +1,223 @@
+# Fork-only CI. Replaces the upstream workflows, which run on runners and
+# secrets that are not available in this fork. Everything here runs on
+# GitHub-hosted runners, which are free for public repositories.
+name: Fork CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_OPTIONS: --max-old-space-size=4096
+
+jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      studio: ${{ steps.filter.outputs.studio }}
+      workflows: ${{ steps.filter.outputs.workflows }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          # paths-filter diffs against github.event.before on push events and
+          # needs enough history to do so without an authenticated fetch.
+          fetch-depth: 50
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: filter
+        with:
+          filters: |
+            studio:
+              - 'apps/studio/**'
+              - 'packages/**'
+              - 'knip.jsonc'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+            workflows:
+              - '.github/workflows/**'
+              - 'zizmor.yml'
+
+  typecheck-lint:
+    name: Typecheck and lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          run_install: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+      - name: Check for case-sensitivity hazards
+        run: node scripts/check-case-hazards.mjs
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm run typecheck
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Lint
+        run: pnpm run lint
+
+  prettier:
+    name: Prettier
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          run_install: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+      - name: Prettier
+        run: pnpm run test:prettier
+
+  misspell:
+    name: Misspell
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: reviewdog/action-misspell@9daa94af4357dddb6fd3775de806bc0a8e98d3e4 # v1.26.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          locale: 'US'
+          reporter: github-pr-review
+          level: error
+          exclude: |
+            *.css
+            **/package.json
+            **/pnpm-lock.yaml
+            ./.git/*
+            *.ipynb
+            ./i18n/README.*.md
+            ./studio/public/monaco-editor/*
+
+  studio-tests:
+    name: Studio unit tests
+    needs: changes
+    if: needs.changes.outputs.studio == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          run_install: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+      - name: Run tests
+        run: pnpm run test:ci
+        working-directory: ./apps/studio
+        env:
+          NODE_OPTIONS: '--max_old_space_size=3072'
+
+  studio-lint-ratchet:
+    name: Studio lint ratchet
+    needs: changes
+    if: needs.changes.outputs.studio == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          run_install: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+      - name: Run ratchet
+        run: pnpm --filter studio run lint:ratchet
+
+  studio-knip:
+    name: Studio dead code (knip)
+    needs: changes
+    if: needs.changes.outputs.studio == 'true'
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --max-old-space-size=6144
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          run_install: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+      - name: Run knip
+        run: pnpm knip --workspace apps/studio --no-progress --reporter symbols --reporter github-actions
+
+  zizmor:
+    name: zizmor
+    needs: changes
+    if: needs.changes.outputs.workflows == 'true'
+    runs-on: ubuntu-latest
+    env:
+      ZIZMOR_VERSION: 1.26.1
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows
+            zizmor.yml
+      - name: Cache zizmor binary
+        id: cache-zizmor
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+        with:
+          path: ~/.local/bin/zizmor
+          key: zizmor-${{ runner.os }}-${{ runner.arch }}-${{ env.ZIZMOR_VERSION }}
+      - name: Download zizmor
+        if: steps.cache-zizmor.outputs.cache-hit != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          archive="zizmor-x86_64-unknown-linux-gnu.tar.gz"
+          curl -sSLO "https://github.com/zizmorcore/zizmor/releases/download/v${ZIZMOR_VERSION}/${archive}"
+          gh attestation verify "${archive}" --repo zizmorcore/zizmor
+          mkdir -p ~/.local/bin
+          tar -xzf "${archive}" -C ~/.local/bin zizmor
+          chmod +x ~/.local/bin/zizmor
+      - name: Run zizmor
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ~/.local/bin/zizmor --config zizmor.yml .github/workflows
