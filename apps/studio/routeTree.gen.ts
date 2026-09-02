@@ -294,6 +294,7 @@ import { Route as ApiV1ProjectsRefTypesTypescriptRouteImport } from './routes/ap
 import { Route as ApiV1ProjectsRefDatabaseMigrationsRouteImport } from './routes/api/v1/projects/$ref/database/migrations'
 import { Route as ApiV1ProjectsRefApiKeysIdRouteImport } from './routes/api/v1/projects/$ref/api-keys/$id'
 import { Route as ApiPlatformPropsProjectRefApiRouteImport } from './routes/api/platform/props/project/$ref/api'
+import { Route as ApiPlatformProjectsRefSelfHostedServiceHealthRouteImport } from './routes/api/platform/projects/$ref/self-hosted/service-health'
 import { Route as ApiPlatformProjectsRefContentCountRouteImport } from './routes/api/platform/projects/$ref/content/count'
 import { Route as ApiPlatformProjectsRefConfigPostgrestRouteImport } from './routes/api/platform/projects/$ref/config/postgrest'
 import { Route as ApiPlatformProjectsRefBillingAddonsRouteImport } from './routes/api/platform/projects/$ref/billing/addons'
@@ -1908,6 +1909,12 @@ const ApiPlatformPropsProjectRefApiRoute =
     path: '/api/platform/props/project/$ref/api',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPlatformProjectsRefSelfHostedServiceHealthRoute =
+  ApiPlatformProjectsRefSelfHostedServiceHealthRouteImport.update({
+    id: '/api/platform/projects/$ref/self-hosted/service-health',
+    path: '/api/platform/projects/$ref/self-hosted/service-health',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPlatformProjectsRefContentCountRoute =
   ApiPlatformProjectsRefContentCountRouteImport.update({
     id: '/api/platform/projects/$ref/content/count',
@@ -2381,6 +2388,7 @@ export interface FileRoutesByFullPath {
   '/api/platform/projects/$ref/billing/addons': typeof ApiPlatformProjectsRefBillingAddonsRoute
   '/api/platform/projects/$ref/config/postgrest': typeof ApiPlatformProjectsRefConfigPostgrestRoute
   '/api/platform/projects/$ref/content/count': typeof ApiPlatformProjectsRefContentCountRoute
+  '/api/platform/projects/$ref/self-hosted/service-health': typeof ApiPlatformProjectsRefSelfHostedServiceHealthRoute
   '/api/platform/props/project/$ref/api': typeof ApiPlatformPropsProjectRefApiRoute
   '/api/v1/projects/$ref/api-keys/$id': typeof ApiV1ProjectsRefApiKeysIdRoute
   '/api/v1/projects/$ref/database/migrations': typeof ApiV1ProjectsRefDatabaseMigrationsRoute
@@ -2685,6 +2693,7 @@ export interface FileRoutesByTo {
   '/api/platform/projects/$ref/billing/addons': typeof ApiPlatformProjectsRefBillingAddonsRoute
   '/api/platform/projects/$ref/config/postgrest': typeof ApiPlatformProjectsRefConfigPostgrestRoute
   '/api/platform/projects/$ref/content/count': typeof ApiPlatformProjectsRefContentCountRoute
+  '/api/platform/projects/$ref/self-hosted/service-health': typeof ApiPlatformProjectsRefSelfHostedServiceHealthRoute
   '/api/platform/props/project/$ref/api': typeof ApiPlatformPropsProjectRefApiRoute
   '/api/v1/projects/$ref/api-keys/$id': typeof ApiV1ProjectsRefApiKeysIdRoute
   '/api/v1/projects/$ref/database/migrations': typeof ApiV1ProjectsRefDatabaseMigrationsRoute
@@ -3006,6 +3015,7 @@ export interface FileRoutesById {
   '/api/platform/projects/$ref/billing/addons': typeof ApiPlatformProjectsRefBillingAddonsRoute
   '/api/platform/projects/$ref/config/postgrest': typeof ApiPlatformProjectsRefConfigPostgrestRoute
   '/api/platform/projects/$ref/content/count': typeof ApiPlatformProjectsRefContentCountRoute
+  '/api/platform/projects/$ref/self-hosted/service-health': typeof ApiPlatformProjectsRefSelfHostedServiceHealthRoute
   '/api/platform/props/project/$ref/api': typeof ApiPlatformPropsProjectRefApiRoute
   '/api/v1/projects/$ref/api-keys/$id': typeof ApiV1ProjectsRefApiKeysIdRoute
   '/api/v1/projects/$ref/database/migrations': typeof ApiV1ProjectsRefDatabaseMigrationsRoute
@@ -3326,6 +3336,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/billing/addons'
     | '/api/platform/projects/$ref/config/postgrest'
     | '/api/platform/projects/$ref/content/count'
+    | '/api/platform/projects/$ref/self-hosted/service-health'
     | '/api/platform/props/project/$ref/api'
     | '/api/v1/projects/$ref/api-keys/$id'
     | '/api/v1/projects/$ref/database/migrations'
@@ -3630,6 +3641,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/billing/addons'
     | '/api/platform/projects/$ref/config/postgrest'
     | '/api/platform/projects/$ref/content/count'
+    | '/api/platform/projects/$ref/self-hosted/service-health'
     | '/api/platform/props/project/$ref/api'
     | '/api/v1/projects/$ref/api-keys/$id'
     | '/api/v1/projects/$ref/database/migrations'
@@ -3950,6 +3962,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/billing/addons'
     | '/api/platform/projects/$ref/config/postgrest'
     | '/api/platform/projects/$ref/content/count'
+    | '/api/platform/projects/$ref/self-hosted/service-health'
     | '/api/platform/props/project/$ref/api'
     | '/api/v1/projects/$ref/api-keys/$id'
     | '/api/v1/projects/$ref/database/migrations'
@@ -4082,6 +4095,7 @@ export interface RootRouteChildren {
   ApiPlatformProjectsRefBillingAddonsRoute: typeof ApiPlatformProjectsRefBillingAddonsRoute
   ApiPlatformProjectsRefConfigPostgrestRoute: typeof ApiPlatformProjectsRefConfigPostgrestRoute
   ApiPlatformProjectsRefContentCountRoute: typeof ApiPlatformProjectsRefContentCountRoute
+  ApiPlatformProjectsRefSelfHostedServiceHealthRoute: typeof ApiPlatformProjectsRefSelfHostedServiceHealthRoute
   ApiPlatformPropsProjectRefApiRoute: typeof ApiPlatformPropsProjectRefApiRoute
   ApiV1ProjectsRefDatabaseMigrationsRoute: typeof ApiV1ProjectsRefDatabaseMigrationsRoute
   ApiV1ProjectsRefTypesTypescriptRoute: typeof ApiV1ProjectsRefTypesTypescriptRoute
@@ -6115,6 +6129,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPlatformPropsProjectRefApiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/platform/projects/$ref/self-hosted/service-health': {
+      id: '/api/platform/projects/$ref/self-hosted/service-health'
+      path: '/api/platform/projects/$ref/self-hosted/service-health'
+      fullPath: '/api/platform/projects/$ref/self-hosted/service-health'
+      preLoaderRoute: typeof ApiPlatformProjectsRefSelfHostedServiceHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/platform/projects/$ref/content/count': {
       id: '/api/platform/projects/$ref/content/count'
       path: '/api/platform/projects/$ref/content/count'
@@ -7167,6 +7188,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPlatformProjectsRefConfigPostgrestRoute,
   ApiPlatformProjectsRefContentCountRoute:
     ApiPlatformProjectsRefContentCountRoute,
+  ApiPlatformProjectsRefSelfHostedServiceHealthRoute:
+    ApiPlatformProjectsRefSelfHostedServiceHealthRoute,
   ApiPlatformPropsProjectRefApiRoute: ApiPlatformPropsProjectRefApiRoute,
   ApiV1ProjectsRefDatabaseMigrationsRoute:
     ApiV1ProjectsRefDatabaseMigrationsRoute,
