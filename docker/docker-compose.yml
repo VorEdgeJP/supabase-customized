@@ -14,7 +14,8 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:2026.08.03-sha-022b374
+    # Fork build, published by .github/workflows/fork-studio-image.yml
+    image: ghcr.io/voredgejp/supabase-customized-studio:2026.09.02
     restart: unless-stopped
     healthcheck:
       test:
@@ -61,6 +62,19 @@ services:
 
       SNIPPETS_MANAGEMENT_FOLDER: /app/snippets
       EDGE_FUNCTIONS_MANAGEMENT_FOLDER: /app/edge-functions
+
+      # Service health checks. The defaults match the service names in this file,
+      # so these only need to be set when a service is moved, renamed, or removed.
+      # Set a URL to an empty string to mark that service as disabled.
+      # SERVICE_HEALTH_AUTH_URL: http://auth:9999/health
+      # SERVICE_HEALTH_REST_URL: http://rest:3001/ready
+      # SERVICE_HEALTH_REALTIME_URL: http://realtime-dev.supabase-realtime:4000/api/tenants/realtime-dev/health
+      # SERVICE_HEALTH_STORAGE_URL: http://storage:5000/status
+      # SERVICE_HEALTH_FUNCTIONS_URL: http://functions:9000/
+      # SERVICE_HEALTH_META_URL: http://meta:8080/health
+      # SERVICE_HEALTH_POOLER_URL: http://supavisor:4000/api/health
+      # SERVICE_HEALTH_API_GATEWAY_URL: http://api-gw:8000/
+      # SERVICE_HEALTH_TIMEOUT_MS: 3000
     volumes:
       - ./volumes/snippets:/app/snippets:z
       - ./volumes/functions:/app/edge-functions:ro,z
@@ -267,7 +281,9 @@ services:
       PGRST_DB_ANON_ROLE: anon
 
       PGRST_ADMIN_SERVER_PORT: 3001
-      PGRST_ADMIN_SERVER_HOST: localhost
+      # Bind the admin server to all IPv4 interfaces so Studio can reach /ready
+      # over the compose network. The port is not published to the host.
+      PGRST_ADMIN_SERVER_HOST: "*4"
 
       # PostgREST accepts a plain-text symmetric secret, a single JWK, or a JWKS.
       # For Podman, use either PGRST_JWT_SECRET: ${JWT_SECRET} or

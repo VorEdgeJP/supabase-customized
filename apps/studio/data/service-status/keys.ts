@@ -7,4 +7,6 @@ export const serviceStatusKeys = {
     ['projects', projectRef, 'service-status'] as const,
   edgeFunctions: (projectRef: string | undefined) =>
     ['projects', projectRef, 'service-status', 'edge-functions'] as const,
+  selfHosted: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'service-status', 'self-hosted'] as const,
 }
