@@ -1,0 +1,36 @@
+# Prometheus configuration for the self-hosted Supabase metrics override.
+#
+# Studio's PromQL depends on these job names, so keep them as `node`,
+# `postgres`, and `gateway`.
+
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  # Host CPU, memory, filesystem, disk I/O, and network metrics.
+  - job_name: node
+    static_configs:
+      - targets:
+          - node-exporter:9100
+
+  # Database connections, database size, settings, and WAL size.
+  - job_name: postgres
+    static_configs:
+      - targets:
+          - postgres-exporter:9187
+
+  # API gateway request counts per upstream service.
+  # Default gateway: the Envoy admin interface (docker-compose.yml).
+  - job_name: gateway
+    metrics_path: /stats/prometheus
+    static_configs:
+      - targets:
+          - api-gw:9901
+
+  # Kong gateway (docker-compose.kong.yml). Comment out the Envoy job above
+  # and uncomment this one when running Kong.
+  #- job_name: gateway
+  #  metrics_path: /metrics
+  #  static_configs:
+  #    - targets:
+  #        - kong:8100

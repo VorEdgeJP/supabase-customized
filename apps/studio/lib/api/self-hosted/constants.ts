@@ -64,3 +64,83 @@ export const SERVICE_HEALTH_TIMEOUT_MS =
   Number.isFinite(parsedServiceHealthTimeoutMs) && parsedServiceHealthTimeoutMs > 0
     ? parsedServiceHealthTimeoutMs
     : DEFAULT_SERVICE_HEALTH_TIMEOUT_MS
+
+// Metrics (Prometheus). Powers the compute/infra charts and the home Requests
+// chart in a self-hosted stack. Everything below is inert by default: without
+// METRICS_PROMETHEUS_URL the existing stub / Logflare behavior is kept.
+
+/** Reads an env var and treats a blank value as unset. */
+function readOptionalEnv(value: string | undefined): string | undefined {
+  const trimmed = value?.trim() ?? ''
+  return trimmed.length > 0 ? trimmed : undefined
+}
+
+/** Base URL of the Prometheus server, e.g. `http://prometheus:9090`. */
+export const METRICS_PROMETHEUS_URL = readOptionalEnv(process.env.METRICS_PROMETHEUS_URL)
+
+export const METRICS_GATEWAYS = ['envoy', 'kong'] as const
+
+export type MetricsGateway = (typeof METRICS_GATEWAYS)[number]
+
+/**
+ * Which gateway exposes the per-service request counters that Prometheus
+ * scrapes. An unrecognized value falls back to the compose default rather than
+ * failing the whole route.
+ */
+function resolveMetricsGateway(): MetricsGateway {
+  const configured = readOptionalEnv(process.env.METRICS_GATEWAY)
+  return (METRICS_GATEWAYS as readonly string[]).includes(configured ?? '')
+    ? (configured as MetricsGateway)
+    : 'envoy'
+}
+
+export const METRICS_GATEWAY = resolveMetricsGateway()
+
+export const METRICS_REQUESTS_SOURCES = ['prometheus', 'logflare', 'disabled'] as const
+
+export type MetricsRequestsSource = (typeof METRICS_REQUESTS_SOURCES)[number]
+
+/**
+ * Data source for the home Requests chart (`usage.api-counts`). An explicit
+ * METRICS_REQUESTS_SOURCE wins when it names a known source; otherwise
+ * Prometheus is preferred over Logflare, and the chart is hidden when neither
+ * is configured.
+ */
+function resolveMetricsRequestsSource(): MetricsRequestsSource {
+  const configured = readOptionalEnv(process.env.METRICS_REQUESTS_SOURCE)
+  if (
+    configured !== undefined &&
+    (METRICS_REQUESTS_SOURCES as readonly string[]).includes(configured)
+  ) {
+    return configured as MetricsRequestsSource
+  }
+
+  if (METRICS_PROMETHEUS_URL !== undefined) return 'prometheus'
+  // LOGFLARE_URL is what lib/constants/api.ts derives PROJECT_ANALYTICS_URL
+  // from; it is read here directly to keep this module free of app imports.
+  if (readOptionalEnv(process.env.LOGFLARE_URL) !== undefined) return 'logflare'
+  return 'disabled'
+}
+
+export const METRICS_REQUESTS_SOURCE = resolveMetricsRequestsSource()
+
+// Upper bound for a single Prometheus request, in milliseconds. A missing or
+// malformed value falls back to the default rather than producing NaN.
+const DEFAULT_METRICS_TIMEOUT_MS = 5000
+const parsedMetricsTimeoutMs = Number.parseInt(process.env.METRICS_TIMEOUT_MS ?? '', 10)
+export const METRICS_TIMEOUT_MS =
+  Number.isFinite(parsedMetricsTimeoutMs) && parsedMetricsTimeoutMs > 0
+    ? parsedMetricsTimeoutMs
+    : DEFAULT_METRICS_TIMEOUT_MS
+
+/** node-exporter `mountpoint` label that disk usage is reported for. */
+export const METRICS_DISK_MOUNTPOINT = readOptionalEnv(process.env.METRICS_DISK_MOUNTPOINT) ?? '/'
+
+/** node-exporter `device` label pattern that network I/O is summed over. */
+export const METRICS_NETWORK_DEVICE_REGEX =
+  readOptionalEnv(process.env.METRICS_NETWORK_DEVICE_REGEX) ?? '^(eth|en|ens|enp).*'
+
+/** True when Prometheus is configured, which is what gates every metrics route. */
+export function isSelfHostedMetricsEnabled(): boolean {
+  return METRICS_PROMETHEUS_URL !== undefined
+}

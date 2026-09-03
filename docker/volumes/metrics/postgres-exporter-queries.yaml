@@ -1,0 +1,13 @@
+# Custom postgres-exporter queries for the self-hosted Supabase metrics
+# override. Loaded with --extend.query-path, so these metrics are collected in
+# addition to the exporter's built-in ones.
+#
+# Exposes pg_wal_size_bytes, used by the dashboard to break down disk usage.
+
+pg_wal_size:
+  query: "SELECT coalesce(sum(size), 0) AS bytes FROM pg_ls_waldir()"
+  master: true
+  metrics:
+    - bytes:
+        usage: "GAUGE"
+        description: "Total size of the write-ahead log directory in bytes"

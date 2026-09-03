@@ -3,6 +3,10 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { retrieveAnalyticsData } from '@/lib/api/self-hosted/logs'
+import {
+  handleUsageApiCounts,
+  shouldServeUsageApiCountsFromPrometheus,
+} from '@/lib/api/self-hosted/metrics/usage-api-counts'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -17,6 +21,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       assert(typeof ref === 'string', 'Invalid or missing ref parameter')
       assert(typeof name === 'string', 'Invalid or missing name parameter')
+
+      if (method === 'GET' && shouldServeUsageApiCountsFromPrometheus(name)) {
+        return handleUsageApiCounts(req, res)
+      }
 
       const { data, error } = await retrieveAnalyticsData({
         name,

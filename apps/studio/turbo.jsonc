@@ -69,6 +69,13 @@
         "SERVICE_HEALTH_POOLER_URL",
         "SERVICE_HEALTH_API_GATEWAY_URL",
         "SERVICE_HEALTH_TIMEOUT_MS",
+        // Self-hosted Prometheus metrics (lib/api/self-hosted/metrics/*)
+        "METRICS_PROMETHEUS_URL",
+        "METRICS_GATEWAY",
+        "METRICS_REQUESTS_SOURCE",
+        "METRICS_TIMEOUT_MS",
+        "METRICS_DISK_MOUNTPOINT",
+        "METRICS_NETWORK_DEVICE_REGEX",
         "READ_ONLY_URL",
         "READ_ONLY_API_KEY",
         "SUPABASE_SERVICE_KEY",

@@ -7,6 +7,10 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DeploymentModeResponse = {
   is_cli_mode: boolean
+  /** Whether the self-hosted stack has Prometheus configured for compute metrics. */
+  metrics_enabled: boolean
+  /** Where the home Requests chart reads its data from. */
+  usage_api_counts_source: 'prometheus' | 'logflare' | 'disabled'
 }
 
 export async function getDeploymentMode(signal?: AbortSignal): Promise<DeploymentModeResponse> {

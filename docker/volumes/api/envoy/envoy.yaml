@@ -21,7 +21,9 @@ overload_manager:
         max_active_downstream_connections: 30000
 
 admin:
+  # Bound to all interfaces so Prometheus can scrape /stats/prometheus over the
+  # compose network. Port 9901 is never published to the host.
   address:
     socket_address:
-      address: 127.0.0.1
+      address: 0.0.0.0
       port_value: 9901
