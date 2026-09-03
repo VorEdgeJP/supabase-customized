@@ -80,7 +80,7 @@ Browser
 | 変数                                                        | 既定値                | 説明                                                                              |
 | ----------------------------------------------------------- | --------------------- | --------------------------------------------------------------------------------- |
 | `BACKUPS_S3_ENDPOINT`                                       | (未設定 = 無効)       | S3 互換エンドポイント。R2 は `https://<account_id>.r2.cloudflarestorage.com`      |
-| `BACKUPS_S3_BUCKET`                                         | (未設定 = 無効)       | バケット名。本番は `botshade-db-buckup`                                           |
+| `BACKUPS_S3_BUCKET`                                         | (未設定 = 無効)       | バケット名                                                                        |
 | `BACKUPS_S3_ACCESS_KEY_ID` / `BACKUPS_S3_SECRET_ACCESS_KEY` | (未設定 = 無効)       | 読み取り専用トークン (Object Read only、バケット限定)                             |
 | `BACKUPS_S3_REGION`                                         | `auto`                | SigV4 のリージョン。R2 は `auto`                                                  |
 | `BACKUPS_S3_PREFIX`                                         | `db/`                 | データベースバックアップのプレフィックス                                          |
@@ -179,6 +179,7 @@ Browser
 
 ## 7. 未確定事項
 
-- R2 の読み取り専用トークンは本番投入時に Cloudflare ダッシュボードで発行します (Object Read only、バケット `botshade-db-buckup` 限定)。
+- R2 の API トークンは Object Read only の権限で、対象バケットに限定して発行してください。バックアップを書き込む cron 側の資格情報を Studio に渡してはいけません。
+- オブジェクトストレージのライフサイクルルールはプレフィックスごとに分けてください。バケット全体に単一のルールを掛けると、日次と月次の世代も短間隔の世代と同じ期間で失効します。
 - Storage sync の一覧はオブジェクト数が多いと `BACKUPS_MAX_LIST_PAGES` に達します。その場合は `isTruncated` を返し、最終更新時刻は列挙できた範囲での値になります。
 - コマンドパレットの Backups 項目は platform のページに飛びます。セルフホストでの整合は別 PR で扱います。
