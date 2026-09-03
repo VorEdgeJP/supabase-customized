@@ -5,6 +5,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 import { ActivityStats } from '@/components/interfaces/ProjectHome/ActivityStats'
 import { ProjectConnectionPopover } from '@/components/interfaces/ProjectHome/ProjectConnectionPopover'
+import { SelfHostedComputeStat } from '@/components/interfaces/ProjectHome/SelfHostedCompute/SelfHostedComputeStat'
 import { SelfHostedServiceStatus } from '@/components/interfaces/ProjectHome/SelfHostedServiceStatus/SelfHostedServiceStatus'
 import { ProjectPausedState } from '@/components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -13,11 +14,13 @@ import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useSelfHostedMetrics } from '@/hooks/misc/useSelfHostedMetrics'
 import { DOCS_URL, IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 
 export const TopSection = () => {
   const isOrioleDb = useIsOrioleDb()
   const { isSelfHosted } = useDeploymentMode()
+  const { isMetricsEnabled } = useSelfHostedMetrics()
   const { data: project, isLoading } = useSelectedProjectQuery()
   const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
 
@@ -91,8 +94,9 @@ export const TopSection = () => {
             </div>
           )}
           {isSelfHosted && (
-            <div className="mt-8">
+            <div className="mt-8 flex flex-row flex-wrap gap-8">
               <SelfHostedServiceStatus />
+              {isMetricsEnabled && <SelfHostedComputeStat />}
             </div>
           )}
         </div>

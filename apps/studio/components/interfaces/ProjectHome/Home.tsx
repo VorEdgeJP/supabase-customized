@@ -29,6 +29,7 @@ import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffol
 import { SortableSection } from '@/components/ui/SortableSection'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useSelfHostedMetrics } from '@/hooks/misc/useSelfHostedMetrics'
 import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
@@ -40,6 +41,9 @@ export const ProjectHome = () => {
   const snap = useAppStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
+  // Self-hosted stacks can serve the Requests chart once a data source is configured.
+  const { isUsageChartEnabled } = useSelfHostedMetrics()
+  const showUsageSection = IS_PLATFORM || isUsageChartEnabled
 
   const showHomepageUsageDeltas = useFlag('newHomepageUsageDeltas')
 
@@ -98,7 +102,8 @@ export const ProjectHome = () => {
 
   const renderOrder = mergeSectionOrder(sectionOrder).filter((id) => {
     if (id === 'connect') return showConnectSection
-    if (id === 'usage' || id === 'custom-report') return IS_PLATFORM
+    if (id === 'usage') return showUsageSection
+    if (id === 'custom-report') return IS_PLATFORM
     return true
   })
 
@@ -119,7 +124,7 @@ export const ProjectHome = () => {
               <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
                 <SortableContext items={renderOrder} strategy={verticalListSortingStrategy}>
                   {renderOrder.map((id) => {
-                    if (IS_PLATFORM && id === 'usage') {
+                    if (showUsageSection && id === 'usage') {
                       return (
                         <div
                           key={id}

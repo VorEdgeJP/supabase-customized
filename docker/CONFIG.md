@@ -130,6 +130,19 @@ These mirror the running PostgREST configuration so the dashboard can display co
 | `NEXT_ANALYTICS_BACKEND_PROVIDER` | enum | Both | Historically intended to select the analytics container's backend (`postgres` or `bigquery`). | No-op today: not read by Studio code, and the `analytics` (supabase/logflare) container chooses its backend via `POSTGRES_BACKEND_URL` / `LOGFLARE_FEATURE_FLAG_OVERRIDE` instead. Safe to ignore. |
 | `NEXT_PUBLIC_ENABLE_LOGS` | boolean | Both | Historically intended to toggle visibility of log explorer pages. | Not read by Studio code today, and not declared in `apps/studio/turbo.jsonc`. Use `ENABLED_FEATURES_LOGS_ALL` (see Feature flags below) for runtime control of the logs section. |
 
+### Metrics (Prometheus)
+
+These drive the compute usage card, the request charts on the project home, and the database charts under Observability. They are only read on self-hosted, and the whole feature stays off until `METRICS_PROMETHEUS_URL` is set. The `docker-compose.metrics.yml` override (`sh run.sh config add metrics`) starts Prometheus with the exporters Studio expects and sets the first two variables for you.
+
+| Variable | Type | Set by | Description | Notes |
+|---|---|---|---|---|
+| `METRICS_PROMETHEUS_URL` | URL | Self-hosted | Base URL of the Prometheus server Studio queries server-side for compute and request metrics. | Unset by default, which disables the metrics charts. Set to `http://prometheus:9090` by `docker-compose.metrics.yml`. Prometheus is never reached from the browser. |
+| `METRICS_GATEWAY` | enum | Self-hosted | API gateway whose metrics carry per-service request counts: `envoy` or `kong`. | Default: `envoy`. Set to `kong` when running the `docker-compose.kong.yml` override. |
+| `METRICS_REQUESTS_SOURCE` | enum | | Data source for the request charts on the project home: `prometheus`, `logflare`, or `disabled`. | Defaults to `prometheus` when `METRICS_PROMETHEUS_URL` is set, otherwise `logflare` when `LOGFLARE_URL` is set, otherwise `disabled`. |
+| `METRICS_TIMEOUT_MS` | integer (ms) | | Timeout for a single Prometheus query. | Default: `5000`. |
+| `METRICS_DISK_MOUNTPOINT` | path | | Filesystem mount point reported as disk usage, matching the node exporter `mountpoint` label. | Default: `/`. |
+| `METRICS_NETWORK_DEVICE_REGEX` | string (regex) | | Network interfaces included in the network I/O charts, matched against the node exporter `device` label. | Default: `^(eth\|en\|ens\|enp).*`. |
+
 ### Feature flags (runtime overrides)
 
 Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time to disable or re-enable individual feature flags without rebuilding the image. The mapping rule is: uppercase the feature key from `packages/common/enabled-features/enabled-features.json` and replace every non-alphanumeric character with `_` (e.g. `logs:all` → `ENABLED_FEATURES_LOGS_ALL`). See `packages/common/enabled-features/README.md` for the full mechanism and the canonical flag list (~90 flags).

@@ -33,6 +33,14 @@ basicauth_credentials:
     password: '$DASHBOARD_PASSWORD'
 
 ###
+### Global plugins
+###
+plugins:
+  # Exposes Kong request metrics on the status listener (/metrics), scraped by
+  # the metrics override (docker-compose.metrics.yml).
+  - name: prometheus
+
+###
 ### API Routes
 ###
 services:
