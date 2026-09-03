@@ -175,7 +175,7 @@ selfHosted: (projectRef: string | undefined) =>
 
 `docker/docker-compose.yml` に対して次を変更します。
 
-1. `rest` サービスの `PGRST_ADMIN_SERVER_HOST` を `localhost` から `"*4"` に変更し、admin サーバー (3001) に Studio コンテナから到達できるようにします。ホストへのポート公開は行わないため、外部には露出しません。
+1. `rest` サービスの `PGRST_ADMIN_SERVER_HOST` を `localhost` から `0.0.0.0` に変更し、admin サーバー (3001) に Studio コンテナから到達できるようにします。Warp の特殊ホスト名 (`"*4"` など) は healthcheck の `postgrest --ready` が拒否するため、リテラルのアドレスを使います。ホストへのポート公開は行わないため、外部には露出しません。
 2. `studio` サービスに `SERVICE_HEALTH_*` 環境変数を追加します。デフォルト値でも動作するため、実際に追加するのは変更が必要な場合の上書き用としてコメント付きの例に留めます。
 3. `studio` サービスの `image:` をフォーク版のイメージに差し替えます。ビルドは `pnpm build:studio:docker` (Next) または `build:studio:docker:tanstack` で行います。
 

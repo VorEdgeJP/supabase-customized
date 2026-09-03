@@ -283,7 +283,9 @@ services:
       PGRST_ADMIN_SERVER_PORT: 3001
       # Bind the admin server to all IPv4 interfaces so Studio can reach /ready
       # over the compose network. The port is not published to the host.
-      PGRST_ADMIN_SERVER_HOST: "*4"
+      # A literal address is required: `postgrest --ready` (the health check)
+      # refuses Warp's special host names such as "*4".
+      PGRST_ADMIN_SERVER_HOST: 0.0.0.0
 
       # PostgREST accepts a plain-text symmetric secret, a single JWK, or a JWKS.
       # For Podman, use either PGRST_JWT_SECRET: ${JWT_SECRET} or
