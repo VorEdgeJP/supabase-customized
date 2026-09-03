@@ -9,6 +9,7 @@ import type {
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useSelfHostedBackups } from '@/hooks/misc/useSelfHostedBackups'
 import { IS_PLATFORM } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
@@ -27,6 +28,7 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
   const pitrEnabled = addons?.selected_addons.some((addon) => addon.type === 'pitr') ?? false
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
   const enablePgReplicate = useIsETLPrivateAlpha()
+  const { isBackupsEnabled } = useSelfHostedBackups()
 
   const getDatabaseURL = (path: string) => `/project/${ref}/database/${path}`
 
@@ -135,6 +137,13 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
           url: pitrEnabled ? getDatabaseURL('backups/pitr') : getDatabaseURL('backups/scheduled'),
           shortcutId: SHORTCUT_IDS.NAV_DATABASE_BACKUPS,
         },
+        !IS_PLATFORM &&
+          isBackupsEnabled && {
+            name: 'Backups',
+            key: 'backups',
+            url: getDatabaseURL('backups'),
+            shortcutId: SHORTCUT_IDS.NAV_DATABASE_BACKUPS,
+          },
         {
           name: 'Migrations',
           key: 'migrations',

@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import type { DeploymentModeResponse } from '@/data/config/deployment-mode-query'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import {
+  isSelfHostedBackupsEnabled,
   isSelfHostedMetricsEnabled,
   METRICS_REQUESTS_SOURCE,
 } from '@/lib/api/self-hosted/constants'
@@ -29,5 +30,6 @@ const handleGet = async (_req: NextApiRequest, res: NextApiResponse<DeploymentMo
     is_cli_mode: IS_CLI,
     metrics_enabled: isSelfHostedMetricsEnabled(),
     usage_api_counts_source: METRICS_REQUESTS_SOURCE,
+    backups_enabled: isSelfHostedBackupsEnabled(),
   })
 }

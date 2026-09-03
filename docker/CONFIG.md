@@ -165,6 +165,24 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | `EDGE_FUNCTIONS_MANAGEMENT_FOLDER` | path | Both | Filesystem directory inside the container where edge function source is read from / written to when using the dashboard editor. | Mounted as a volume in `docker-compose.yml` (`./volumes/functions:/app/edge-functions`). |
 | `SNIPPETS_MANAGEMENT_FOLDER` | path | Both | Filesystem directory inside the container where SQL editor snippets are persisted. | Mounted as a volume in `docker-compose.yml` (`./volumes/snippets:/app/snippets`). |
 
+### Backups (S3 / R2 listing)
+
+Studio does not create backups: the host's cron writes them to an S3-compatible bucket, and Studio lists that bucket and hands out short-lived download links. Point these at a **read-only** token scoped to the backup bucket - never the write token the cron uses. The Backups page and the "Last backup" card on the project home stay hidden until `BACKUPS_S3_ENDPOINT`, `BACKUPS_S3_BUCKET`, `BACKUPS_S3_ACCESS_KEY_ID` and `BACKUPS_S3_SECRET_ACCESS_KEY` are all set.
+
+| Variable | Type | Set by | Description | Notes |
+|---|---|---|---|---|
+| `BACKUPS_S3_ENDPOINT` | URL | Self-hosted | Endpoint of the S3-compatible bucket that holds the backups. | Cloudflare R2 format: `https://<account_id>.r2.cloudflarestorage.com`. Unset disables the feature. |
+| `BACKUPS_S3_BUCKET` | string | Self-hosted | Bucket name. | Unset disables the feature. |
+| `BACKUPS_S3_ACCESS_KEY_ID` | string | Self-hosted | Access key ID used to sign the listing and download requests. | Use a read-only token limited to this bucket ("Object Read only" on R2). Unset disables the feature. |
+| `BACKUPS_S3_SECRET_ACCESS_KEY` | string | Self-hosted | Secret access key paired with `BACKUPS_S3_ACCESS_KEY_ID`. | Never exposed to the browser. Unset disables the feature. |
+| `BACKUPS_S3_REGION` | string | Self-hosted | Region used for the SigV4 signature. | Default: `auto`, which is what R2 expects. |
+| `BACKUPS_S3_PREFIX` | string (key prefix) | Self-hosted | Key prefix the database backup generations live under. | Default: `db/`. A trailing slash is added if missing. |
+| `BACKUPS_STORAGE_PREFIX` | string (key prefix) | Self-hosted | Key prefix of the storage volume sync. | Unset hides the storage summary. E.g. `storage/current/`. |
+| `BACKUPS_EXPECTED_INTERVAL_HOURS` | number (hours) | Self-hosted | How often a new backup generation is expected. | Default: `6`. Studio warns once the newest generation is older than twice this value. |
+| `BACKUPS_TIMEOUT_MS` | integer (ms) | Self-hosted | Timeout for a single request to the bucket. | Default: `10000`. |
+| `BACKUPS_DOWNLOAD_URL_TTL_SECONDS` | integer (seconds) | Self-hosted | Lifetime of a presigned download URL. | Default: `600`. Clamped to 60-604800 (the SigV4 limit). |
+| `BACKUPS_MAX_LIST_PAGES` | integer (count) | Self-hosted | Maximum number of `ListObjectsV2` pages walked per request. | Default: `20` (1000 objects per page). Studio flags the listing as truncated past this. |
+
 ### Platform flags / runtime mode
 
 | Variable | Type | Set by | Description | Notes |

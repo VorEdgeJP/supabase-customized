@@ -75,6 +75,21 @@ services:
       # SERVICE_HEALTH_POOLER_URL: http://supavisor:4000/api/health
       # SERVICE_HEALTH_API_GATEWAY_URL: http://api-gw:8000/
       # SERVICE_HEALTH_TIMEOUT_MS: 3000
+
+      # Backup listing. Studio only reads the bucket the backup cron writes to,
+      # so give it a read-only token. The Backups page stays hidden until an
+      # endpoint, a bucket and a credential pair are all set.
+      BACKUPS_S3_ENDPOINT: ${BACKUPS_S3_ENDPOINT:-}
+      BACKUPS_S3_BUCKET: ${BACKUPS_S3_BUCKET:-}
+      BACKUPS_S3_ACCESS_KEY_ID: ${BACKUPS_S3_ACCESS_KEY_ID:-}
+      BACKUPS_S3_SECRET_ACCESS_KEY: ${BACKUPS_S3_SECRET_ACCESS_KEY:-}
+      BACKUPS_S3_REGION: ${BACKUPS_S3_REGION:-auto}
+      BACKUPS_S3_PREFIX: ${BACKUPS_S3_PREFIX:-db/}
+      BACKUPS_STORAGE_PREFIX: ${BACKUPS_STORAGE_PREFIX:-}
+      BACKUPS_EXPECTED_INTERVAL_HOURS: ${BACKUPS_EXPECTED_INTERVAL_HOURS:-6}
+      BACKUPS_TIMEOUT_MS: ${BACKUPS_TIMEOUT_MS:-10000}
+      BACKUPS_DOWNLOAD_URL_TTL_SECONDS: ${BACKUPS_DOWNLOAD_URL_TTL_SECONDS:-600}
+      BACKUPS_MAX_LIST_PAGES: ${BACKUPS_MAX_LIST_PAGES:-20}
     volumes:
       - ./volumes/snippets:/app/snippets:z
       - ./volumes/functions:/app/edge-functions:ro,z
