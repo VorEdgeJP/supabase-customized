@@ -160,7 +160,7 @@ export async function queryRange({
     try {
       await response.body?.cancel()
     } catch {
-      // Cancelling an already-consumed body is not an error worth reporting.
+      // Canceling an already-consumed body is not an error worth reporting.
     }
     throw new PrometheusError(`Prometheus responded with HTTP ${response.status}`)
   }
