@@ -183,6 +183,14 @@ Studio does not create backups: the host's cron writes them to an S3-compatible 
 | `BACKUPS_DOWNLOAD_URL_TTL_SECONDS` | integer (seconds) | Self-hosted | Lifetime of a presigned download URL. | Default: `600`. Clamped to 60-604800 (the SigV4 limit). |
 | `BACKUPS_MAX_LIST_PAGES` | integer (count) | Self-hosted | Maximum number of `ListObjectsV2` pages walked per request. | Default: `20` (1000 objects per page). Studio flags the listing as truncated past this. |
 
+### Navigation trimming
+
+A self-hosted stack does not have to run every service. When one is switched off, `STUDIO_DISABLED_FEATURES` removes its navigation entries and related widgets from the dashboard, so nothing links to a service that is not there. The pages stay reachable by URL, which matches how the same feature keys behave on the hosted dashboard.
+
+| Variable | Type | Set by | Description | Notes |
+|---|---|---|---|---|
+| `STUDIO_DISABLED_FEATURES` | string (CSV) | Self-hosted | Product areas to hide from the dashboard. | Unset shows everything. Recognized keys: `project_auth:all`, `project_edge_function:all`, `project_storage:all`, `realtime:all`. Example: `project_auth:all,project_edge_function:all,realtime:all` |
+
 ### Platform flags / runtime mode
 
 | Variable | Type | Set by | Description | Notes |
