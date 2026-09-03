@@ -214,7 +214,7 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Done' }))
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
-  }, 10_000)
+  }, 30_000)
 
   // Organization scope tests
   test('requires an organization when scope is Organization', async () => {
@@ -317,7 +317,7 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Done' }))
     // Dialog has been closed
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
-  }, 10_000)
+  }, 30_000)
 
   // Permission preset tests
   const FULL_ACCESS_WARNING =

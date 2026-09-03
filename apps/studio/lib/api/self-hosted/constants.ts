@@ -236,3 +236,18 @@ export function isSelfHostedBackupsEnabled(): boolean {
     BACKUPS_S3_SECRET_ACCESS_KEY !== undefined
   )
 }
+
+// Product areas hidden from the self-hosted dashboard. A deployment that does
+// not run, say, Auth or Edge Functions can drop their navigation entries
+// instead of leaving links to services that are switched off. The values are
+// the dashboard's own feature keys (`project_auth:all`,
+// `project_edge_function:all`, `project_storage:all`, `realtime:all`), which
+// the profile endpoint reports as `disabled_features`.
+//
+// Hiding an area removes its navigation entries and related widgets. The pages
+// themselves stay reachable by URL, which matches how the same flags behave on
+// the hosted dashboard.
+export const STUDIO_DISABLED_FEATURES = (process.env.STUDIO_DISABLED_FEATURES ?? '')
+  .split(',')
+  .map((feature) => feature.trim())
+  .filter((feature) => feature.length > 0)

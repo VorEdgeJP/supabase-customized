@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { apiWrapper } from '@/lib/api/apiWrapper'
+import { STUDIO_DISABLED_FEATURES } from '@/lib/api/self-hosted/constants'
 import { DEFAULT_PROJECT } from '@/lib/constants/api'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
@@ -25,6 +26,9 @@ const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
     username: 'johndoe',
     first_name: 'John',
     last_name: 'Doe',
+    // Product areas this deployment does not run. The dashboard reads these to
+    // drop the matching navigation entries and widgets.
+    disabled_features: STUDIO_DISABLED_FEATURES,
     organizations: [
       {
         id: 1,

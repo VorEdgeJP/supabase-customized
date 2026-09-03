@@ -88,6 +88,8 @@
         "BACKUPS_TIMEOUT_MS",
         "BACKUPS_DOWNLOAD_URL_TTL_SECONDS",
         "BACKUPS_MAX_LIST_PAGES",
+        // Self-hosted navigation trimming (pages/api/platform/profile)
+        "STUDIO_DISABLED_FEATURES",
         "READ_ONLY_URL",
         "READ_ONLY_API_KEY",
         "SUPABASE_SERVICE_KEY",
