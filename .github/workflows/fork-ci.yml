@@ -143,7 +143,9 @@ jobs:
       - name: Install deps
         run: pnpm install --frozen-lockfile
       - name: Run tests
-        run: pnpm run test:ci --shard=${{ matrix.shard }}/3
+        # The per-test timeout is relaxed for the same reason: a handful of
+        # component tests take 5-10x longer here than on the upstream runner.
+        run: pnpm run test:ci --shard=${{ matrix.shard }}/3 --testTimeout=30000 --hookTimeout=30000
         working-directory: ./apps/studio
         env:
           NODE_OPTIONS: '--max_old_space_size=3072'
