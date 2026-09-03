@@ -11,6 +11,8 @@ export type DeploymentModeResponse = {
   metrics_enabled: boolean
   /** Where the home Requests chart reads its data from. */
   usage_api_counts_source: 'prometheus' | 'logflare' | 'disabled'
+  /** True when a self-hosted deployment has a backup bucket configured. */
+  backups_enabled: boolean
 }
 
 export async function getDeploymentMode(signal?: AbortSignal): Promise<DeploymentModeResponse> {

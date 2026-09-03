@@ -217,6 +217,7 @@ import { Route as ProjectRefDatabaseTriggersIndexRouteImport } from './routes/pr
 import { Route as ProjectRefDatabaseTablesIndexRouteImport } from './routes/project/$ref/database/tables/index'
 import { Route as ProjectRefDatabaseReplicationIndexRouteImport } from './routes/project/$ref/database/replication/index'
 import { Route as ProjectRefDatabasePublicationsIndexRouteImport } from './routes/project/$ref/database/publications/index'
+import { Route as ProjectRefDatabaseBackupsIndexRouteImport } from './routes/project/$ref/database/backups/index'
 import { Route as ProjectRefAuthTemplatesIndexRouteImport } from './routes/project/$ref/auth/templates/index'
 import { Route as ApiPlatformProjectsRefIndexRouteImport } from './routes/api/platform/projects/$ref/index'
 import { Route as AppOrgSlugWebhooksIndexRouteImport } from './routes/_app/org/$slug/webhooks/index'
@@ -307,10 +308,12 @@ import { Route as ProjectRefIntegrationsIdPageIdChildIdIndexRouteImport } from '
 import { Route as ApiV1ProjectsRefFunctionsSlugIndexRouteImport } from './routes/api/v1/projects/$ref/functions/$slug/index'
 import { Route as ApiPlatformStorageRefVectorBucketsIdIndexRouteImport } from './routes/api/platform/storage/$ref/vector-buckets/$id/index'
 import { Route as ApiPlatformStorageRefBucketsIdIndexRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/index'
+import { Route as ApiPlatformProjectsRefSelfHostedBackupsIndexRouteImport } from './routes/api/platform/projects/$ref/self-hosted/backups/index'
 import { Route as ApiPlatformProjectsRefContentFoldersIndexRouteImport } from './routes/api/platform/projects/$ref/content/folders/index'
 import { Route as ApiPlatformAuthRefUsersIdIndexRouteImport } from './routes/api/platform/auth/$ref/users/$id/index'
 import { Route as ApiV1ProjectsRefFunctionsSlugBodyRouteImport } from './routes/api/v1/projects/$ref/functions/$slug/body'
 import { Route as ApiPlatformStorageRefBucketsIdEmptyRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/empty'
+import { Route as ApiPlatformProjectsRefSelfHostedBackupsDownloadRouteImport } from './routes/api/platform/projects/$ref/self-hosted/backups/download'
 import { Route as ApiPlatformProjectsRefContentItemIdRouteImport } from './routes/api/platform/projects/$ref/content/item/$id'
 import { Route as ApiPlatformProjectsRefContentFoldersIdRouteImport } from './routes/api/platform/projects/$ref/content/folders/$id'
 import { Route as ApiPlatformProjectsRefConfigSecretsUpdateStatusRouteImport } from './routes/api/platform/projects/$ref/config/secrets/update-status'
@@ -1451,6 +1454,12 @@ const ProjectRefDatabasePublicationsIndexRoute =
     path: '/publications/',
     getParentRoute: () => ProjectRefDatabaseRoute,
   } as any)
+const ProjectRefDatabaseBackupsIndexRoute =
+  ProjectRefDatabaseBackupsIndexRouteImport.update({
+    id: '/backups/',
+    path: '/backups/',
+    getParentRoute: () => ProjectRefDatabaseRoute,
+  } as any)
 const ProjectRefAuthTemplatesIndexRoute =
   ProjectRefAuthTemplatesIndexRouteImport.update({
     id: '/templates/',
@@ -1987,6 +1996,12 @@ const ApiPlatformStorageRefBucketsIdIndexRoute =
     path: '/api/platform/storage/$ref/buckets/$id/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPlatformProjectsRefSelfHostedBackupsIndexRoute =
+  ApiPlatformProjectsRefSelfHostedBackupsIndexRouteImport.update({
+    id: '/api/platform/projects/$ref/self-hosted/backups/',
+    path: '/api/platform/projects/$ref/self-hosted/backups/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPlatformProjectsRefContentFoldersIndexRoute =
   ApiPlatformProjectsRefContentFoldersIndexRouteImport.update({
     id: '/api/platform/projects/$ref/content/folders/',
@@ -2009,6 +2024,12 @@ const ApiPlatformStorageRefBucketsIdEmptyRoute =
   ApiPlatformStorageRefBucketsIdEmptyRouteImport.update({
     id: '/api/platform/storage/$ref/buckets/$id/empty',
     path: '/api/platform/storage/$ref/buckets/$id/empty',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPlatformProjectsRefSelfHostedBackupsDownloadRoute =
+  ApiPlatformProjectsRefSelfHostedBackupsDownloadRouteImport.update({
+    id: '/api/platform/projects/$ref/self-hosted/backups/download',
+    path: '/api/platform/projects/$ref/self-hosted/backups/download',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPlatformProjectsRefContentItemIdRoute =
@@ -2366,6 +2387,7 @@ export interface FileRoutesByFullPath {
   '/org/$slug/webhooks/': typeof AppOrgSlugWebhooksIndexRoute
   '/api/platform/projects/$ref/': typeof ApiPlatformProjectsRefIndexRoute
   '/project/$ref/auth/templates/': typeof ProjectRefAuthTemplatesIndexRoute
+  '/project/$ref/database/backups/': typeof ProjectRefDatabaseBackupsIndexRoute
   '/project/$ref/database/publications/': typeof ProjectRefDatabasePublicationsIndexRoute
   '/project/$ref/database/replication/': typeof ProjectRefDatabaseReplicationIndexRoute
   '/project/$ref/database/tables/': typeof ProjectRefDatabaseTablesIndexRoute
@@ -2413,10 +2435,12 @@ export interface FileRoutesByFullPath {
   '/api/platform/projects/$ref/config/secrets/update-status': typeof ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute
   '/api/platform/projects/$ref/content/folders/$id': typeof ApiPlatformProjectsRefContentFoldersIdRoute
   '/api/platform/projects/$ref/content/item/$id': typeof ApiPlatformProjectsRefContentItemIdRoute
+  '/api/platform/projects/$ref/self-hosted/backups/download': typeof ApiPlatformProjectsRefSelfHostedBackupsDownloadRoute
   '/api/platform/storage/$ref/buckets/$id/empty': typeof ApiPlatformStorageRefBucketsIdEmptyRoute
   '/api/v1/projects/$ref/functions/$slug/body': typeof ApiV1ProjectsRefFunctionsSlugBodyRoute
   '/api/platform/auth/$ref/users/$id/': typeof ApiPlatformAuthRefUsersIdIndexRoute
   '/api/platform/projects/$ref/content/folders/': typeof ApiPlatformProjectsRefContentFoldersIndexRoute
+  '/api/platform/projects/$ref/self-hosted/backups/': typeof ApiPlatformProjectsRefSelfHostedBackupsIndexRoute
   '/api/platform/storage/$ref/buckets/$id/': typeof ApiPlatformStorageRefBucketsIdIndexRoute
   '/api/platform/storage/$ref/vector-buckets/$id/': typeof ApiPlatformStorageRefVectorBucketsIdIndexRoute
   '/api/v1/projects/$ref/functions/$slug/': typeof ApiV1ProjectsRefFunctionsSlugIndexRoute
@@ -2671,6 +2695,7 @@ export interface FileRoutesByTo {
   '/org/$slug/webhooks': typeof AppOrgSlugWebhooksIndexRoute
   '/api/platform/projects/$ref': typeof ApiPlatformProjectsRefIndexRoute
   '/project/$ref/auth/templates': typeof ProjectRefAuthTemplatesIndexRoute
+  '/project/$ref/database/backups': typeof ProjectRefDatabaseBackupsIndexRoute
   '/project/$ref/database/publications': typeof ProjectRefDatabasePublicationsIndexRoute
   '/project/$ref/database/replication': typeof ProjectRefDatabaseReplicationIndexRoute
   '/project/$ref/database/tables': typeof ProjectRefDatabaseTablesIndexRoute
@@ -2718,10 +2743,12 @@ export interface FileRoutesByTo {
   '/api/platform/projects/$ref/config/secrets/update-status': typeof ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute
   '/api/platform/projects/$ref/content/folders/$id': typeof ApiPlatformProjectsRefContentFoldersIdRoute
   '/api/platform/projects/$ref/content/item/$id': typeof ApiPlatformProjectsRefContentItemIdRoute
+  '/api/platform/projects/$ref/self-hosted/backups/download': typeof ApiPlatformProjectsRefSelfHostedBackupsDownloadRoute
   '/api/platform/storage/$ref/buckets/$id/empty': typeof ApiPlatformStorageRefBucketsIdEmptyRoute
   '/api/v1/projects/$ref/functions/$slug/body': typeof ApiV1ProjectsRefFunctionsSlugBodyRoute
   '/api/platform/auth/$ref/users/$id': typeof ApiPlatformAuthRefUsersIdIndexRoute
   '/api/platform/projects/$ref/content/folders': typeof ApiPlatformProjectsRefContentFoldersIndexRoute
+  '/api/platform/projects/$ref/self-hosted/backups': typeof ApiPlatformProjectsRefSelfHostedBackupsIndexRoute
   '/api/platform/storage/$ref/buckets/$id': typeof ApiPlatformStorageRefBucketsIdIndexRoute
   '/api/platform/storage/$ref/vector-buckets/$id': typeof ApiPlatformStorageRefVectorBucketsIdIndexRoute
   '/api/v1/projects/$ref/functions/$slug': typeof ApiV1ProjectsRefFunctionsSlugIndexRoute
@@ -2993,6 +3020,7 @@ export interface FileRoutesById {
   '/_app/org/$slug/webhooks/': typeof AppOrgSlugWebhooksIndexRoute
   '/api/platform/projects/$ref/': typeof ApiPlatformProjectsRefIndexRoute
   '/project/$ref/auth/templates/': typeof ProjectRefAuthTemplatesIndexRoute
+  '/project/$ref/database/backups/': typeof ProjectRefDatabaseBackupsIndexRoute
   '/project/$ref/database/publications/': typeof ProjectRefDatabasePublicationsIndexRoute
   '/project/$ref/database/replication/': typeof ProjectRefDatabaseReplicationIndexRoute
   '/project/$ref/database/tables/': typeof ProjectRefDatabaseTablesIndexRoute
@@ -3040,10 +3068,12 @@ export interface FileRoutesById {
   '/api/platform/projects/$ref/config/secrets/update-status': typeof ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute
   '/api/platform/projects/$ref/content/folders/$id': typeof ApiPlatformProjectsRefContentFoldersIdRoute
   '/api/platform/projects/$ref/content/item/$id': typeof ApiPlatformProjectsRefContentItemIdRoute
+  '/api/platform/projects/$ref/self-hosted/backups/download': typeof ApiPlatformProjectsRefSelfHostedBackupsDownloadRoute
   '/api/platform/storage/$ref/buckets/$id/empty': typeof ApiPlatformStorageRefBucketsIdEmptyRoute
   '/api/v1/projects/$ref/functions/$slug/body': typeof ApiV1ProjectsRefFunctionsSlugBodyRoute
   '/api/platform/auth/$ref/users/$id/': typeof ApiPlatformAuthRefUsersIdIndexRoute
   '/api/platform/projects/$ref/content/folders/': typeof ApiPlatformProjectsRefContentFoldersIndexRoute
+  '/api/platform/projects/$ref/self-hosted/backups/': typeof ApiPlatformProjectsRefSelfHostedBackupsIndexRoute
   '/api/platform/storage/$ref/buckets/$id/': typeof ApiPlatformStorageRefBucketsIdIndexRoute
   '/api/platform/storage/$ref/vector-buckets/$id/': typeof ApiPlatformStorageRefVectorBucketsIdIndexRoute
   '/api/v1/projects/$ref/functions/$slug/': typeof ApiV1ProjectsRefFunctionsSlugIndexRoute
@@ -3314,6 +3344,7 @@ export interface FileRouteTypes {
     | '/org/$slug/webhooks/'
     | '/api/platform/projects/$ref/'
     | '/project/$ref/auth/templates/'
+    | '/project/$ref/database/backups/'
     | '/project/$ref/database/publications/'
     | '/project/$ref/database/replication/'
     | '/project/$ref/database/tables/'
@@ -3361,10 +3392,12 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/config/secrets/update-status'
     | '/api/platform/projects/$ref/content/folders/$id'
     | '/api/platform/projects/$ref/content/item/$id'
+    | '/api/platform/projects/$ref/self-hosted/backups/download'
     | '/api/platform/storage/$ref/buckets/$id/empty'
     | '/api/v1/projects/$ref/functions/$slug/body'
     | '/api/platform/auth/$ref/users/$id/'
     | '/api/platform/projects/$ref/content/folders/'
+    | '/api/platform/projects/$ref/self-hosted/backups/'
     | '/api/platform/storage/$ref/buckets/$id/'
     | '/api/platform/storage/$ref/vector-buckets/$id/'
     | '/api/v1/projects/$ref/functions/$slug/'
@@ -3619,6 +3652,7 @@ export interface FileRouteTypes {
     | '/org/$slug/webhooks'
     | '/api/platform/projects/$ref'
     | '/project/$ref/auth/templates'
+    | '/project/$ref/database/backups'
     | '/project/$ref/database/publications'
     | '/project/$ref/database/replication'
     | '/project/$ref/database/tables'
@@ -3666,10 +3700,12 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/config/secrets/update-status'
     | '/api/platform/projects/$ref/content/folders/$id'
     | '/api/platform/projects/$ref/content/item/$id'
+    | '/api/platform/projects/$ref/self-hosted/backups/download'
     | '/api/platform/storage/$ref/buckets/$id/empty'
     | '/api/v1/projects/$ref/functions/$slug/body'
     | '/api/platform/auth/$ref/users/$id'
     | '/api/platform/projects/$ref/content/folders'
+    | '/api/platform/projects/$ref/self-hosted/backups'
     | '/api/platform/storage/$ref/buckets/$id'
     | '/api/platform/storage/$ref/vector-buckets/$id'
     | '/api/v1/projects/$ref/functions/$slug'
@@ -3940,6 +3976,7 @@ export interface FileRouteTypes {
     | '/_app/org/$slug/webhooks/'
     | '/api/platform/projects/$ref/'
     | '/project/$ref/auth/templates/'
+    | '/project/$ref/database/backups/'
     | '/project/$ref/database/publications/'
     | '/project/$ref/database/replication/'
     | '/project/$ref/database/tables/'
@@ -3987,10 +4024,12 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/config/secrets/update-status'
     | '/api/platform/projects/$ref/content/folders/$id'
     | '/api/platform/projects/$ref/content/item/$id'
+    | '/api/platform/projects/$ref/self-hosted/backups/download'
     | '/api/platform/storage/$ref/buckets/$id/empty'
     | '/api/v1/projects/$ref/functions/$slug/body'
     | '/api/platform/auth/$ref/users/$id/'
     | '/api/platform/projects/$ref/content/folders/'
+    | '/api/platform/projects/$ref/self-hosted/backups/'
     | '/api/platform/storage/$ref/buckets/$id/'
     | '/api/platform/storage/$ref/vector-buckets/$id/'
     | '/api/v1/projects/$ref/functions/$slug/'
@@ -4112,10 +4151,12 @@ export interface RootRouteChildren {
   ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute: typeof ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute
   ApiPlatformProjectsRefContentFoldersIdRoute: typeof ApiPlatformProjectsRefContentFoldersIdRoute
   ApiPlatformProjectsRefContentItemIdRoute: typeof ApiPlatformProjectsRefContentItemIdRoute
+  ApiPlatformProjectsRefSelfHostedBackupsDownloadRoute: typeof ApiPlatformProjectsRefSelfHostedBackupsDownloadRoute
   ApiPlatformStorageRefBucketsIdEmptyRoute: typeof ApiPlatformStorageRefBucketsIdEmptyRoute
   ApiV1ProjectsRefFunctionsSlugBodyRoute: typeof ApiV1ProjectsRefFunctionsSlugBodyRoute
   ApiPlatformAuthRefUsersIdIndexRoute: typeof ApiPlatformAuthRefUsersIdIndexRoute
   ApiPlatformProjectsRefContentFoldersIndexRoute: typeof ApiPlatformProjectsRefContentFoldersIndexRoute
+  ApiPlatformProjectsRefSelfHostedBackupsIndexRoute: typeof ApiPlatformProjectsRefSelfHostedBackupsIndexRoute
   ApiPlatformStorageRefBucketsIdIndexRoute: typeof ApiPlatformStorageRefBucketsIdIndexRoute
   ApiPlatformStorageRefVectorBucketsIdIndexRoute: typeof ApiPlatformStorageRefVectorBucketsIdIndexRoute
   ApiV1ProjectsRefFunctionsSlugIndexRoute: typeof ApiV1ProjectsRefFunctionsSlugIndexRoute
@@ -5590,6 +5631,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefDatabasePublicationsIndexRouteImport
       parentRoute: typeof ProjectRefDatabaseRoute
     }
+    '/project/$ref/database/backups/': {
+      id: '/project/$ref/database/backups/'
+      path: '/backups'
+      fullPath: '/project/$ref/database/backups/'
+      preLoaderRoute: typeof ProjectRefDatabaseBackupsIndexRouteImport
+      parentRoute: typeof ProjectRefDatabaseRoute
+    }
     '/project/$ref/auth/templates/': {
       id: '/project/$ref/auth/templates/'
       path: '/templates'
@@ -6220,6 +6268,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPlatformStorageRefBucketsIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/platform/projects/$ref/self-hosted/backups/': {
+      id: '/api/platform/projects/$ref/self-hosted/backups/'
+      path: '/api/platform/projects/$ref/self-hosted/backups'
+      fullPath: '/api/platform/projects/$ref/self-hosted/backups/'
+      preLoaderRoute: typeof ApiPlatformProjectsRefSelfHostedBackupsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/platform/projects/$ref/content/folders/': {
       id: '/api/platform/projects/$ref/content/folders/'
       path: '/api/platform/projects/$ref/content/folders'
@@ -6246,6 +6301,13 @@ declare module '@tanstack/react-router' {
       path: '/api/platform/storage/$ref/buckets/$id/empty'
       fullPath: '/api/platform/storage/$ref/buckets/$id/empty'
       preLoaderRoute: typeof ApiPlatformStorageRefBucketsIdEmptyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/platform/projects/$ref/self-hosted/backups/download': {
+      id: '/api/platform/projects/$ref/self-hosted/backups/download'
+      path: '/api/platform/projects/$ref/self-hosted/backups/download'
+      fullPath: '/api/platform/projects/$ref/self-hosted/backups/download'
+      preLoaderRoute: typeof ApiPlatformProjectsRefSelfHostedBackupsDownloadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/platform/projects/$ref/content/item/$id': {
@@ -6635,6 +6697,7 @@ interface ProjectRefDatabaseRouteChildren {
   ProjectRefDatabasePublicationsIdRoute: typeof ProjectRefDatabasePublicationsIdRoute
   ProjectRefDatabaseReplicationPipelineIdRoute: typeof ProjectRefDatabaseReplicationPipelineIdRoute
   ProjectRefDatabaseTablesIdRoute: typeof ProjectRefDatabaseTablesIdRoute
+  ProjectRefDatabaseBackupsIndexRoute: typeof ProjectRefDatabaseBackupsIndexRoute
   ProjectRefDatabasePublicationsIndexRoute: typeof ProjectRefDatabasePublicationsIndexRoute
   ProjectRefDatabaseReplicationIndexRoute: typeof ProjectRefDatabaseReplicationIndexRoute
   ProjectRefDatabaseTablesIndexRoute: typeof ProjectRefDatabaseTablesIndexRoute
@@ -6663,6 +6726,7 @@ const ProjectRefDatabaseRouteChildren: ProjectRefDatabaseRouteChildren = {
   ProjectRefDatabaseReplicationPipelineIdRoute:
     ProjectRefDatabaseReplicationPipelineIdRoute,
   ProjectRefDatabaseTablesIdRoute: ProjectRefDatabaseTablesIdRoute,
+  ProjectRefDatabaseBackupsIndexRoute: ProjectRefDatabaseBackupsIndexRoute,
   ProjectRefDatabasePublicationsIndexRoute:
     ProjectRefDatabasePublicationsIndexRoute,
   ProjectRefDatabaseReplicationIndexRoute:
@@ -7215,6 +7279,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPlatformProjectsRefContentFoldersIdRoute,
   ApiPlatformProjectsRefContentItemIdRoute:
     ApiPlatformProjectsRefContentItemIdRoute,
+  ApiPlatformProjectsRefSelfHostedBackupsDownloadRoute:
+    ApiPlatformProjectsRefSelfHostedBackupsDownloadRoute,
   ApiPlatformStorageRefBucketsIdEmptyRoute:
     ApiPlatformStorageRefBucketsIdEmptyRoute,
   ApiV1ProjectsRefFunctionsSlugBodyRoute:
@@ -7222,6 +7288,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPlatformAuthRefUsersIdIndexRoute: ApiPlatformAuthRefUsersIdIndexRoute,
   ApiPlatformProjectsRefContentFoldersIndexRoute:
     ApiPlatformProjectsRefContentFoldersIndexRoute,
+  ApiPlatformProjectsRefSelfHostedBackupsIndexRoute:
+    ApiPlatformProjectsRefSelfHostedBackupsIndexRoute,
   ApiPlatformStorageRefBucketsIdIndexRoute:
     ApiPlatformStorageRefBucketsIdIndexRoute,
   ApiPlatformStorageRefVectorBucketsIdIndexRoute:

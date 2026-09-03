@@ -189,6 +189,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/database/backups/pitr.tsx` ← `pages/project/[ref]/database/backups/pitr.tsx`
 - [x] A `routes/project/$ref/database/backups/restore-to-new-project.tsx` ← `pages/project/[ref]/database/backups/restore-to-new-project.tsx`
 - [x] A `routes/project/$ref/database/backups/scheduled.tsx` ← `pages/project/[ref]/database/backups/scheduled.tsx`
+- [x] A `routes/project/$ref/database/backups/index.tsx` ← `pages/project/[ref]/database/backups/index.tsx` (self-hosted backups; redirects to `scheduled` on platform builds)
 
 ### Project shell — `/auth/*`
 

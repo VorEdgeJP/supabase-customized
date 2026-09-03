@@ -144,3 +144,95 @@ export const METRICS_NETWORK_DEVICE_REGEX =
 export function isSelfHostedMetricsEnabled(): boolean {
   return METRICS_PROMETHEUS_URL !== undefined
 }
+
+// Backup listing (lib/api/self-hosted/backups/*). Studio never creates backups:
+// it lists what the host's cron already uploaded to an S3-compatible bucket and
+// hands out short-lived download URLs. The credentials below are expected to be
+// read-only and scoped to that single bucket.
+
+/** Normalizes a key prefix so that it always ends in a single slash. */
+function withTrailingSlash(value: string): string {
+  return value.endsWith('/') ? value : `${value}/`
+}
+
+/** S3-compatible endpoint, e.g. `https://<account_id>.r2.cloudflarestorage.com`. */
+export const BACKUPS_S3_ENDPOINT = readOptionalEnv(process.env.BACKUPS_S3_ENDPOINT)
+export const BACKUPS_S3_BUCKET = readOptionalEnv(process.env.BACKUPS_S3_BUCKET)
+export const BACKUPS_S3_ACCESS_KEY_ID = readOptionalEnv(process.env.BACKUPS_S3_ACCESS_KEY_ID)
+export const BACKUPS_S3_SECRET_ACCESS_KEY = readOptionalEnv(
+  process.env.BACKUPS_S3_SECRET_ACCESS_KEY
+)
+
+/** SigV4 region. Cloudflare R2 signs with `auto`. */
+export const BACKUPS_S3_REGION = readOptionalEnv(process.env.BACKUPS_S3_REGION) ?? 'auto'
+
+/** Key prefix the database backup generations live under. */
+export const BACKUPS_S3_PREFIX = withTrailingSlash(
+  readOptionalEnv(process.env.BACKUPS_S3_PREFIX) ?? 'db/'
+)
+
+/** Key prefix of the storage volume sync. Unset hides the storage summary. */
+const configuredBackupsStoragePrefix = readOptionalEnv(process.env.BACKUPS_STORAGE_PREFIX)
+export const BACKUPS_STORAGE_PREFIX =
+  configuredBackupsStoragePrefix === undefined
+    ? undefined
+    : withTrailingSlash(configuredBackupsStoragePrefix)
+
+// How often a new generation is expected. Twice this window without one marks
+// the latest backup as stale in the dashboard.
+const DEFAULT_BACKUPS_EXPECTED_INTERVAL_HOURS = 6
+const parsedBackupsExpectedIntervalHours = Number.parseFloat(
+  process.env.BACKUPS_EXPECTED_INTERVAL_HOURS ?? ''
+)
+export const BACKUPS_EXPECTED_INTERVAL_HOURS =
+  Number.isFinite(parsedBackupsExpectedIntervalHours) && parsedBackupsExpectedIntervalHours > 0
+    ? parsedBackupsExpectedIntervalHours
+    : DEFAULT_BACKUPS_EXPECTED_INTERVAL_HOURS
+
+// Upper bound for a single request to the bucket, in milliseconds. A missing or
+// malformed value falls back to the default rather than producing NaN.
+const DEFAULT_BACKUPS_TIMEOUT_MS = 10000
+const parsedBackupsTimeoutMs = Number.parseInt(process.env.BACKUPS_TIMEOUT_MS ?? '', 10)
+export const BACKUPS_TIMEOUT_MS =
+  Number.isFinite(parsedBackupsTimeoutMs) && parsedBackupsTimeoutMs > 0
+    ? parsedBackupsTimeoutMs
+    : DEFAULT_BACKUPS_TIMEOUT_MS
+
+// Lifetime of a presigned download URL, in seconds. SigV4 rejects an expiry
+// beyond seven days, so the configured value is clamped to a range that always
+// signs successfully.
+const DEFAULT_BACKUPS_DOWNLOAD_URL_TTL_SECONDS = 600
+const MIN_BACKUPS_DOWNLOAD_URL_TTL_SECONDS = 60
+const MAX_BACKUPS_DOWNLOAD_URL_TTL_SECONDS = 604800
+const parsedBackupsDownloadUrlTtlSeconds = Number.parseInt(
+  process.env.BACKUPS_DOWNLOAD_URL_TTL_SECONDS ?? '',
+  10
+)
+export const BACKUPS_DOWNLOAD_URL_TTL_SECONDS = Math.min(
+  MAX_BACKUPS_DOWNLOAD_URL_TTL_SECONDS,
+  Math.max(
+    MIN_BACKUPS_DOWNLOAD_URL_TTL_SECONDS,
+    Number.isFinite(parsedBackupsDownloadUrlTtlSeconds) && parsedBackupsDownloadUrlTtlSeconds > 0
+      ? parsedBackupsDownloadUrlTtlSeconds
+      : DEFAULT_BACKUPS_DOWNLOAD_URL_TTL_SECONDS
+  )
+)
+
+// Page cap for ListObjectsV2, which returns up to 1000 objects per page. Hitting
+// it truncates the listing instead of walking a bucket without end.
+const DEFAULT_BACKUPS_MAX_LIST_PAGES = 20
+const parsedBackupsMaxListPages = Number.parseInt(process.env.BACKUPS_MAX_LIST_PAGES ?? '', 10)
+export const BACKUPS_MAX_LIST_PAGES =
+  Number.isFinite(parsedBackupsMaxListPages) && parsedBackupsMaxListPages > 0
+    ? parsedBackupsMaxListPages
+    : DEFAULT_BACKUPS_MAX_LIST_PAGES
+
+/** True once an endpoint, a bucket and a credential pair are all configured. */
+export function isSelfHostedBackupsEnabled(): boolean {
+  return (
+    BACKUPS_S3_ENDPOINT !== undefined &&
+    BACKUPS_S3_BUCKET !== undefined &&
+    BACKUPS_S3_ACCESS_KEY_ID !== undefined &&
+    BACKUPS_S3_SECRET_ACCESS_KEY !== undefined
+  )
+}
