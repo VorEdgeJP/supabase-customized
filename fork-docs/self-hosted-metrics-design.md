@@ -201,8 +201,8 @@ Prometheus の設定は `docker/volumes/metrics/prometheus.yml` に置きます�
 
 ## 7. 未確定事項
 
-- 本番 (Kong 2.8.1) で `kong_http_status` の `service` ラベルが期待通りに付くかは実機で確認が必要です。
-- 本番には Logflare 1.31.2 + Vector が稼働しています。`METRICS_REQUESTS_SOURCE=logflare` で Logflare の `usage.api-counts` エンドポイントが Postgres バックエンドで正しく集計されるかも実機で確認します。
+- Kong 2.8 系のイメージには prometheus プラグインが同梱されており (`/usr/local/share/lua/5.1/kong/plugins/prometheus`)、既定では無効です。`KONG_PLUGINS` への追加、宣言設定への `plugins: - name: prometheus`、`KONG_STATUS_LISTEN` の設定で有効になります。`kong_http_status` の `service` ラベルが期待どおりかは、有効化後に `/metrics` を見て確認してください。
+- Logflare の `usage.api-counts` は Postgres バックエンド構成では利用できません。HTTP 200 で `{"error":{"code":502}}` が返ることを実機で確認しました。そのため `METRICS_REQUESTS_SOURCE` は Prometheus を既定とし、Logflare は選択肢として残すだけにしています。
 - `node-exporter` がホストの `/` を読むため、Studio が表示する CPU / メモリはコンテナ単位ではなくホスト全体の値になります。Cloud の「インスタンス」に相当するのはホストそのものなので、この解釈で問題ないと判断しています。
 - Prometheus の保持期間 15 日は Observability の最大レンジ (7 日) を満たします。
 - `network_receive_bytes` / `network_transmit_bytes` は node-exporter コンテナ自身のネットワーク名前空間の値になります (`/proc/net/dev` は名前空間ごとのため、`--path.rootfs` では回避できません)。現状これらを使うチャートは無いため、`network_mode: host` は採用していません。必要になった時点で検討します。
