@@ -49,6 +49,8 @@
 - `meta` — Studio のテーブルエディタと SQL エディタの実体です
 - `studio` — 使用します
 
+この構成では API ロールを使わないため、`DISABLE_SIGNUP=true` にしてサインアップを止め、業務用スキーマから `anon` / `authenticated` / `service_role` の権限を外してください (「実機で踏んだ落とし穴」を参照)。
+
 停止できるのは `auth`、`functions`、`realtime` です。Logs 画面を使わないなら `analytics` と `vector` も止められます。この 2 つは Vector が全コンテナのログを読み続け、Logflare が常駐したうえで書き込みが DB に蓄積されるため、負荷軽減の効果が最も大きい組み合わせです。停止する場合は Studio の `ENABLED_FEATURES_LOGS_ALL` を `false` に戻してください。
 
 Requests グラフを Logflare ではなく Prometheus から取る設定 (`METRICS_REQUESTS_SOURCE=prometheus`) にしていれば、`analytics` を止めてもホームのグラフは残ります。
@@ -94,7 +96,20 @@ docker compose restart nginx   # リバースプロキシを使っている場�
 
 **Kong の prometheus プラグインは同梱されていますが既定では無効です。** イメージにはプラグイン本体が含まれているため、`KONG_PLUGINS` への追加と宣言設定への `plugins: - name: prometheus` の記述、`KONG_STATUS_LISTEN` の設定で有効になります。ビルドし直す必要はありません。
 
-**セルフホストの Studio には認証機能がありません。** `withAuth` は `IS_PLATFORM` が false のとき素通しになります。ダッシュボードを守っているのはゲートウェイの basic auth (`DASHBOARD_USERNAME` / `DASHBOARD_PASSWORD`) か、その前段のリバースプロキシです。Studio のポートを直接公開する構成にする場合は、プロキシ側で確実に認証を掛けてください。GoTrue (`auth`) はダッシュボードのログインには一切関与しないため、`auth` を停止してもログインには影響しません。
+**セルフホストの Studio には認証機能がありません。公開ポートの扱いにも注意が必要です。** `withAuth` は `IS_PLATFORM` が false のとき素通しになります。ダッシュボードを守っているのはゲートウェイの basic auth (`DASHBOARD_USERNAME` / `DASHBOARD_PASSWORD`) か、その前段のリバースプロキシです。GoTrue (`auth`) はダッシュボードのログインには一切関与しないため、`auth` を停止してもログインには影響しません。
+同梱の compose は Postgres (5432)、Supavisor (6543 など)、Studio (3000) を `0.0.0.0` に公開します。Docker の公開ポートは ufw のルールより前の段階で DNAT されるため、`ufw deny` を設定していても遮断されません。外部に出す必要のないポートは、compose の `ports` を `127.0.0.1:5432:5432` のように書いて bind を限定するか、iptables の `DOCKER-USER` チェーンで許可元を絞ってください。Studio のポートを直接公開する構成にする場合は、プロキシ側で確実に認証を掛けてください。ホストで稼働中のほかのコンテナ (MySQL など) も同じ扱いです。VPS やクラウドの前段ファイアウォールだけに頼っている場合も、その設定が外れたときに露出するため、ホスト側でも塞いでおくと安全です。
+
+**`.env` の権限は 600 にしてください。** `docker/.env` には DB のパスワード、JWT シークレット、各種キーが入っています。既定の umask のままだと 644 や 674 になり、同じホストの他ユーザーから読めます。`chmod 600 docker/.env` を実施し、所有者もサービスを動かすユーザーに限ってください。あわせて `DASHBOARD_USERNAME` も既定値の `supabase` から変更してください。
+
+**auth を使わないなら `DISABLE_SIGNUP=true` にしてください。** 既定は `false` で、公開した API ゲートウェイ経由で誰でもユーザーを作れます。アプリケーションが GoTrue を使わない構成では、サインアップを止めておくのが安全です。
+
+**別スキーマの表にも `anon` / `authenticated` / `service_role` の権限が付き得ます。** Supabase は `public` スキーマの既定権限で、これら 3 つの API ロールに全権限を与えます。`public` で作った表を `ALTER TABLE ... SET SCHEMA` で業務用スキーマへ移すと ACL を引き継ぐ場合があり、また Supabase が付ける既定権限を巻き込む場合もあります。PostgREST に公開していないスキーマなら API からは届きませんが、`USAGE` を足す、`PGRST_DB_SCHEMAS` に加える、といった変更ひとつで漏れます。RLS が無効な表では特に危険です。アプリケーションが自前のロールで接続する業務用スキーマでは、3 つの API ロールの権限を表・シーケンス・関数・ビューのすべてから外し、既定権限 (`ALTER DEFAULT PRIVILEGES`) にも残さないでください。付与の原因は構成によるため、実際に何が付いているかは `information_schema.role_table_grants` などで確かめてください。実例と剥奪のリビジョンは botshade-db の https://github.com/VorEdgeJP/botshade-db/pull/43 を参照してください。
+
+**拡張や `SECURITY DEFINER` 関数の実行権も `anon` に渡っています。** `pg_net` の `net.http_get` / `net.http_post` は `anon` / `authenticated` が実行できる状態で入ります。Supabase が `supabase_admin` 所有で用意する `SECURITY DEFINER` 関数 (例は `public.rls_auto_enable`) も同様です。API ロールを使わない構成では、これらの実行権も外してください。所有者でなければ REVOKE できないため、`supabase_admin` などの superuser で流す必要があります。
+
+**イメージの更新や古いバックアップからの復元で付与が戻り得ます。** 拡張のバージョンが上がると `pg_net` の付与が既定に戻り、剥奪前のダンプを復元すれば付与ごと戻ります。更新や復元のあとは必ず点検を回し直してください。
+
+**点検には botshade-db の `scripts/db_leak_audit.sh` を使えます。** 読み取り専用で、API ロールへの付与、`SECURITY DEFINER` 関数、拡張、公開ポート、`.env` の権限などを一度に確認します。出力の `[!]` が要確認の印です。ホストに合わせて読み替えれば、ほかの構成でも点検項目の参考になります。
 
 **Studio の Storage 画面はゲートウェイを経由します。** `pages/api/platform/storage/[ref]/**` は `SUPABASE_URL` を向いた supabase-js クライアントを使うため、Studio → ゲートウェイ → `storage` という経路になります。リバースプロキシが `/storage/v1` をゲートウェイを通さず `storage` に直接転送している構成でも、Studio 内部の経路は変わりません。
 
