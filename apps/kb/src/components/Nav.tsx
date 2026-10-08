@@ -9,15 +9,16 @@ import {
   navigationMenuTriggerStyle,
 } from 'ui'
 
+import { TOPICS, topicToSlug } from '../lib/topics'
+
+const visibleTopics = TOPICS.filter((topic) => topic.visible).map((topic) => ({
+  label: topic.name,
+  href: `${import.meta.env.BASE_URL}/topics/${topicToSlug(topic.name)}`,
+}))
+
 /**
  * Hard-codding links in here for now until we have actual content. Might be worth putting these arrays in their on data file too.
  */
-const topics = [
-  { label: 'Troubleshooting', href: '#' },
-  { label: 'Migrations', href: '#' },
-  { label: 'Comparisons', href: '#' },
-]
-
 const resources = [
   { label: 'Status', href: 'https://status.supabase.com' },
   { label: 'Changelog', href: 'https://supabase.com/changelog' },
@@ -25,19 +26,19 @@ const resources = [
 ]
 
 const menus = [
-  { label: 'Topics', items: topics },
+  { label: 'Topics', items: visibleTopics },
   { label: 'Resources', items: resources },
 ]
 
 const triggerClass =
-  'h-(--header-height) p-2 border-transparent font-normal rounded-none text-foreground-light hover:text-foreground data-open:text-foreground! border-0 focus-ring focus-visible:text-foreground h-full focus-visible:rounded-sm shadow-none!'
+  'h-(--header-height) p-2 bg-transparent border-transparent font-normal rounded-none text-foreground-light hover:text-foreground data-open:text-foreground! border-0 focus-ring focus-visible:text-foreground h-full focus-visible:rounded-sm shadow-none!'
 // docs gates this at `md:absolute` (its own base component class) because its
 // nav is hidden entirely below `lg` in favor of a separate mobile menu. kb
 // doesn't have that split — the nav is always visible — so `absolute` is
 // unconditional here; without it, an open menu pushes its siblings around
 // below the `md` breakpoint instead of overlaying them.
 const contentClass =
-  'absolute top-[calc(100%+4px)]! min-w-56 max-h-[calc(100vh-4rem)] border-y w-screen md:w-64 overflow-hidden overflow-y-auto rounded-none md:rounded-md md:border border-overlay bg-overlay text-foreground-light shadow-md duration-0!'
+  'absolute top-[calc(100%+4px)]! z-50 min-w-56 max-h-[calc(100vh-4rem)] border-y w-screen md:w-64 overflow-hidden overflow-y-auto rounded-none md:rounded-md md:border border-overlay bg-overlay text-foreground-light shadow-md duration-0!'
 const itemClass =
   'w-full flex h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md p-2 leading-none no-underline focus-ring focus-visible:text-foreground'
 
