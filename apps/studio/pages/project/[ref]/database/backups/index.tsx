@@ -11,7 +11,7 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { SelfHostedBackupsList } from '@/components/interfaces/Database/Backups/SelfHosted/SelfHostedBackupsList'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
