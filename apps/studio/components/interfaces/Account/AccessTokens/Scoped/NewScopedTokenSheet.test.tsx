@@ -497,7 +497,10 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
     fireEvent.click(await findOption('None'))
 
-    await waitFor(async () => expect((await getPresetTrigger()).textContent).toContain('Custom'))
+    // The fork's 2 vCPU CI runners need longer than the default 1s for this re-render
+    await waitFor(async () => expect((await getPresetTrigger()).textContent).toContain('Custom'), {
+      timeout: 10_000,
+    })
     expect(screen.queryByText(FULL_ACCESS_WARNING, { selector: '[role="alert"] *' })).toBeNull()
   })
 
