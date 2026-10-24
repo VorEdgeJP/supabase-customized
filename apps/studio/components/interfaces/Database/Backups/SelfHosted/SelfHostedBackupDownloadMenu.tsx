@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ChevronDown, Download } from 'lucide-react'
+import { ChevronDownIcon, DownloadIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -40,8 +40,8 @@ export const SelfHostedBackupDownloadMenu = ({ backup }: SelfHostedBackupDownloa
       <DropdownMenuTrigger asChild>
         <Button
           variant="default"
-          icon={<Download />}
-          iconRight={<ChevronDown />}
+          icon={<DownloadIcon />}
+          iconRight={<ChevronDownIcon />}
           loading={isDownloading}
           disabled={!projectRef || backup.files.length === 0 || isDownloading}
         >

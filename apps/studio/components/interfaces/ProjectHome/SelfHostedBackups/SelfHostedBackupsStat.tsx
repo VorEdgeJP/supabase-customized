@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Archive, Loader2 } from 'lucide-react'
+import { ArchiveIcon, Loader2Icon } from 'lucide-react'
 import { cn, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
@@ -32,7 +32,7 @@ export const SelfHostedBackupsStat = () => {
   if (isLoading) {
     return (
       <SingleStat
-        icon={<Loader2 className="animate-spin" size={18} />}
+        icon={<Loader2Icon className="animate-spin" size={18} />}
         label={<span>Last backup</span>}
         value={<span>Checking...</span>}
       />
@@ -59,7 +59,7 @@ export const SelfHostedBackupsStat = () => {
   const stat = (
     <SingleStat
       href={`/project/${ref}/database/backups`}
-      icon={<Archive size={18} strokeWidth={1.5} className="text-foreground-light" />}
+      icon={<ArchiveIcon size={18} strokeWidth={1.5} className="text-foreground-light" />}
       label={<span>Last backup</span>}
       value={
         latest ? (
