@@ -61,7 +61,7 @@
     "@lexical/rich-text": "0.51.0",
     "@mjackson/multipart-parser": "^0.10.1",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@modelcontextprotocol/server": "^2.0.0",
+    "@modelcontextprotocol/server": "^2.3.0",
     "@monaco-editor/react": "catalog:",
     "@next/bundle-analyzer": "16.2.3",
     "@number-flow/react": "^0.3.2",
