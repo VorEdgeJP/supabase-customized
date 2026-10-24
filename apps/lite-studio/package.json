@@ -29,6 +29,6 @@
     "config": "workspace:*",
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
-    "vite": "^8.0.0"
+    "vite": "catalog:"
   }
 }

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Cpu, Loader2 } from 'lucide-react'
+import { CpuIcon, Loader2Icon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 
@@ -65,7 +65,7 @@ export const SelfHostedComputeStat = () => {
   if (isLoading) {
     return (
       <SingleStat
-        icon={<Loader2 className="animate-spin" size={18} />}
+        icon={<Loader2Icon className="animate-spin" size={18} />}
         label={<span>Compute</span>}
         value={<span>Checking...</span>}
       />
@@ -97,7 +97,7 @@ export const SelfHostedComputeStat = () => {
     <HoverCard openDelay={200} closeDelay={100}>
       <HoverCardTrigger tabIndex={0}>
         <SingleStat
-          icon={<Cpu size={18} strokeWidth={1.5} className="text-foreground-light" />}
+          icon={<CpuIcon size={18} strokeWidth={1.5} className="text-foreground-light" />}
           label={<span>Compute</span>}
           value={
             <span className="text-sm">

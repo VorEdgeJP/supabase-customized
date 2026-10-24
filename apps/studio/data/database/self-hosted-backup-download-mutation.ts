@@ -1,4 +1,4 @@
-import { useMutation, type UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -8,7 +8,7 @@ import {
   type SelfHostedBackupDownloadResponse,
 } from '@/lib/api/self-hosted/backups/backups.types'
 import { BASE_PATH } from '@/lib/constants'
-import { ResponseError } from '@/types'
+import { ResponseError, type UseCustomMutationOptions } from '@/types'
 
 // The API route answers with `{ data: null, error: { message } }`; `apiWrapper`
 // answers with `{ error }` on an unhandled failure. A flat `{ message }` is
@@ -57,7 +57,7 @@ export const useSelfHostedBackupDownloadMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     SelfHostedBackupDownloadData,
     SelfHostedBackupDownloadError,
     SelfHostedBackupDownloadVariables

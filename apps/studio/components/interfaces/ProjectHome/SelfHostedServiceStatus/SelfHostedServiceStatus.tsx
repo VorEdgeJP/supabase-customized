@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { AlertTriangle, CheckCircle2, Loader2, MinusCircle } from 'lucide-react'
+import { AlertTriangleIcon, CheckCircle2Icon, Loader2Icon, MinusCircleIcon } from 'lucide-react'
 import { cn, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 
 import {
@@ -31,11 +31,11 @@ const iconProps = { size: 18, strokeWidth: 1.5 }
 const StatusIcon = ({ status }: { status: ServiceStatus }) => {
   switch (status) {
     case 'ACTIVE_HEALTHY':
-      return <CheckCircle2 {...iconProps} className="text-brand" />
+      return <CheckCircle2Icon {...iconProps} className="text-brand" />
     case 'DISABLED':
-      return <MinusCircle {...iconProps} className="text-foreground-lighter" />
+      return <MinusCircleIcon {...iconProps} className="text-foreground-lighter" />
     case 'UNHEALTHY':
-      return <AlertTriangle {...iconProps} />
+      return <AlertTriangleIcon {...iconProps} />
   }
 }
 
@@ -69,7 +69,7 @@ export const SelfHostedServiceStatus = () => {
   if (isLoading) {
     return (
       <SingleStat
-        icon={<Loader2 className="animate-spin" size={18} />}
+        icon={<Loader2Icon className="animate-spin" size={18} />}
         label={<span>Status</span>}
         value={<span>Checking...</span>}
       />
