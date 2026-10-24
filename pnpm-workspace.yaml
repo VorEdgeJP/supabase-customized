@@ -12,8 +12,8 @@ enableGlobalVirtualStore: false
 
 catalog:
   '@monaco-editor/react': 4.8.0-rc.3
-  '@sentry/nextjs': ^10.59.0
-  '@sentry/tanstackstart-react': ^10.59.0
+  '@sentry/nextjs': ^10.76.2
+  '@sentry/tanstackstart-react': ^10.76.2
   '@supabase/auth-js': 2.117.3
   '@supabase/postgrest-js': 2.117.3
   '@supabase/realtime-js': 2.117.3
@@ -33,7 +33,7 @@ catalog:
   '@typescript/native': npm:typescript@~7.0.2
   '@vitejs/plugin-react': ^6.0.1
   '@vitest/coverage-v8': ^5.0.0
-  '@vitest/ui': ^5.0.0
+  '@vitest/ui': ^5.0.5
   cn: ^0.4.0
   lodash: ^4.18.1
   lodash-es: ^4.18.1
@@ -42,7 +42,7 @@ catalog:
   lucide-react: ^1.55.0
   monaco-editor: 0.52.2
   motion: ^11.18.2
-  next: ^16.3.6
+  next: ^16.4.2
   next-themes: ^0.4.6
   postcss: ^8.5.18
   radix-ui: ^1.4.3
@@ -57,7 +57,7 @@ catalog:
   valtio: ^2.3.2
   vite: ^8.3.5
   velite: ^0.4.0
-  vitest: ^5.0.0
+  vitest: ^5.0.5
   zod: 3.25.76
 
 allowBuilds:
@@ -108,6 +108,7 @@ overrides:
   '@mapbox/node-pre-gyp>tar': ^7.5.21
   '@sentry/webpack-plugin>uuid': ^11.1.1
   '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
+  '@vercel/routing-utils>path-to-regexp': ^6.3.0
   braintrust>esbuild: ^0.28.1
   braintrust>uuid: ^11.1.1
   cacache>tar: ^7.5.21
